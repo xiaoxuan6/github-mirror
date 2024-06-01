@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="./dist/tailwind.min.css"/>
+</head>
+<body class="bg-gray-200 h-screen">
+<div class="flex flex-col">
+    <p class="font-bold text-4xl mx-4 my-4">Github-Mirror</p>
+    <div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
+        <p class="font-bold">随机复制一个节点，添加到 git 地址前面即可</p>
+        <div class="flex">
+            <p class="font-bold">例如：
+            <div class="bg-red-500 text-white">https://example.com</div>
+            /https://github.com/xiaoxuan6/github-mirror/blog/main/README.md</p>
+        </div>
+    </div>
+</div>
+<div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
+    <table class="table-auto w-full">
+        <!--        <thead>-->
+        <!--        <tr>-->
+        <!--            <th class="border border-gray-700 bg-blue-200 w-4/12 p-2">-->
+        <!--                接口-->
+        <!--            </th>-->
+        <!--            <th class="border border-gray-700 bg-blue-200 w-4/12 p-2">-->
+        <!--                接口-->
+        <!--            </th>-->
+        <!--            <th class="border border-gray-700 bg-blue-200 w-4/12 p-2">-->
+        <!--                接口-->
+        <!--            </th>-->
+        <!--            <th class="border border-gray-700 bg-blue-200 w-4/12 p-2">-->
+        <!--                接口-->
+        <!--            </th>-->
+        <!--        </tr>-->
+        <!--        </thead>-->
+        <tbody id="tbody">
+        <!--        <tr>-->
+        <!--            <td class="border w-3/12 p-2 text-center" id="http-101-35-42-207-1188">-->
+        <!--                http://101.35.42.207:1188-->
+        <!--                <button class="btn" data-clipboard-target="#http-101-35-42-207-1188" data-clipboard-action="copy">-->
+        <!--                    <img src="./dist/clippy.svg" width="16"/>-->
+        <!--                </button>-->
+        <!--            </td>-->
+        <!--        </tr>-->
+        </tbody>
+    </table>
+</div>
+</div>
+<script src="./dist/clipboard.min.js"></script>
+<script>
+    let clipboard = new ClipboardJS('.btn');
+
+    clipboard.on('success', function (e) {
+        console.info('Text:', e.text);
+    });
+
+    clipboard.on('error', function (e) {
+        console.info('Action:', e.action);
+        // console.info('Text:', e.text);
+        // console.info('Trigger:', e.trigger);
+    });
+
+    (function () {
+        window.addEventListener("load", function () {
+            fetch("/api/urls")
+                .then((res) => {
+                    if (res.ok === false) {
+                        console.error("请求失败，状态码: " + res.status);
+                    }
+
+                    return res.json()
+                })
+                .then((data) => {
+                    console.log(data)
+                    // let tbody = document.getElementById("tbody");
+                    // for (let obj of data.data) {
+                    //     let {url, status} = obj;
+                    //     let tr = document.createElement("tr");
+                    //     let td1 = document.createElement("td");
+                    //     let td2 = document.createElement("td");
+                    //     td1.innerHTML = url;
+                    //     let color = status === "1" ? "text-green-500" : "text-red-500";
+                    //     td1.className = "border border-gray-700 p-2";
+                    //     td2.className = `border border-gray-700 p-2 text-center ${color}`;
+                    //     td2.innerHTML = status === "1" ? "可用" : "不可用";
+                    //     tr.appendChild(td1);
+                    //     tr.appendChild(td2);
+                    //     tbody.appendChild(tr);
+                    // }
+                })
+                .catch((error) => {
+                    console.log("请求失败：", error)
+                });
+        });
+    })();
+</script>
+</body>
+</html>

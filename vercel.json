@@ -1,0 +1,12 @@
+{
+    "routes": [
+        {
+            "src": "/",
+            "dest": "/mirror.html"
+        },
+        {
+            "src": "/api/urls",
+            "dest": "/api/api.go"
+        }
+    ]
+}
