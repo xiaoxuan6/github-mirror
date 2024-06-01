@@ -1,9 +1,31 @@
 package api
 
-import "net/http"
+import (
+    "encoding/json"
+    "net/http"
+)
+
+type Response struct {
+    Code int
+    Msg  string
+    Data []string
+}
 
 func Api(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
-    _, _ = w.Write([]byte(`{"code":200, "msg": "ok"}`))
+    response := &Response{
+        Code: 200,
+        Msg:  "ok",
+        Data: []string{
+            "http://101.35.42.207:1188",
+            "http://101.35.42.207:1188",
+            "http://101.35.42.207:1188",
+            "http://101.35.42.207:1188",
+            "http://101.35.42.207:1188",
+        },
+    }
+
+    b, _ := json.Marshal(response)
+    _, _ = w.Write(b)
 }
