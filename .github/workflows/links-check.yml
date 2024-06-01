@@ -3,7 +3,7 @@ name: 🔗 检查链接
 on:
   workflow_dispatch:
   schedule:
-    - cron: "00 16 1 * *"
+    - cron: "00 16 * * 1"
 
 jobs:
   linkChecker:
@@ -41,3 +41,13 @@ jobs:
           title: 🔗 链接检查报告
           content-filepath: ./lychee/out.md
           labels: report
+
+      - name: check fail url and resync kv
+        if: success()
+        env:
+          key: ${{ secrets.key }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+        run: |
+          echo $(cat lychee/out.md | awk '/\[ERR\]/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|https://||g' | tr -d '/')
+          cat lychee/out.md | awk '/\[ERR\]/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|https://||g' | tr -d '/' | xargs echo > out.md
+          go run resync.go
