@@ -10,3 +10,6 @@ trim_trailing_whitespace = true
 
 [.json]
 indent_size = tab
+
+[*.{yml, yaml}]
+indent_size = 2
