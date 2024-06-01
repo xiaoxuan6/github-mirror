@@ -24,14 +24,6 @@
 <div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
     <table class="table-auto w-full">
         <tbody id="tbody">
-        <!--        <tr>-->
-        <!--            <td class="border w-3/12 p-2 text-center" id="http-101-35-42-207-1188">-->
-        <!--                http://101.35.42.207:1188-->
-        <!--                <button class="btn" data-clipboard-target="#http-101-35-42-207-1188" data-clipboard-action="copy">-->
-        <!--                    <img src="./dist/clippy.svg" width="16"/>-->
-        <!--                </button>-->
-        <!--            </td>-->
-        <!--        </tr>-->
         </tbody>
     </table>
 </div>
@@ -64,27 +56,32 @@
                     return res.json()
                 })
                 .then((data) => {
+                    NProgress.done();
                     if (data.code !== 200) {
-                        NProgress.done();
                         Notiflix.Notify.failure('数据加载失败！' + data.msg);
                         return
                     }
 
                     let items = data.data
                     let tbody = document.getElementById("tbody");
-                    for (let obj of items) {
-                        let tr = document.createElement("tr");
-                        let td1 = document.createElement("td");
-                        let td2 = document.createElement("td");
-                        td1.innerHTML = url;
-                        let color = status === "1" ? "text-green-500" : "text-red-500";
-                        td1.className = "border border-gray-700 p-2";
-                        td2.className = `border border-gray-700 p-2 text-center ${color}`;
-                        td2.innerHTML = status === "1" ? "可用" : "不可用";
-                        tr.appendChild(td1);
-                        tr.appendChild(td2);
-                        tbody.appendChild(tr);
+                    let i = 0
+                    let innerHtml = ''
+                    for (let url of items) {
+
+                        let id = url.replaceAll('.', '-').replaceAll('://', '-').trim()
+                        let td = '<td className="border w-3/12 p-2 text-center" id="' + id + '">\n' +
+                            '       <button className="btn" data-clipboard-target="#' + id + '" data-clipboard-action="copy">\n' +
+                            '           <img src="./dist/clippy.svg" width="16"/>\n' +
+                            '       </button>' +
+                            '</td>'
+
+                        if (i % 5 === 0) {
+                            innerHtml += '<tr>' + td + '</tr>\n'
+                        }
+
+                        i++
                     }
+                    tbody.innerHTML = innerHtml;
                 })
                 .catch((error) => {
                     NProgress.done();
