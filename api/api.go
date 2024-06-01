@@ -6,9 +6,9 @@ import (
 )
 
 type Response struct {
-    Code int
-    Msg  string
-    Data []string
+    Code int      `json:"code"`
+    Msg  string   `json:"msg"`
+    Data []string `json:"data"`
 }
 
 func Api(w http.ResponseWriter, r *http.Request) {
