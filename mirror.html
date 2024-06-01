@@ -32,19 +32,19 @@
 <script src="dist/js/notiflix-3.2.6.min.js"></script>
 <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
 <script>
-    let clipboard = new ClipboardJS('.btn');
-
-    clipboard.on('success', function (e) {
-        console.info('Text:', e.text);
-    });
-
-    clipboard.on('error', function (e) {
-        console.info('Action:', e.action);
-        // console.info('Text:', e.text);
-        // console.info('Trigger:', e.trigger);
-    });
-
     (function () {
+        function initializeClipboard() {
+            let clipboard = new ClipboardJS('.btn');
+
+            clipboard.on('success', function (e) {
+                console.info('Text:', e.text);
+            });
+
+            clipboard.on('error', function (e) {
+                console.info('Action:', e.action);
+            });
+        }
+
         window.addEventListener("load", function () {
             NProgress.start();
             fetch("/api/urls")
@@ -62,31 +62,37 @@
                         return
                     }
 
+                    let i = 1
+                    let td = ''
                     let items = data.data
                     let tbody = document.getElementById("tbody");
-                    let i = 0
-                    let innerHtml = ''
+
                     for (let url of items) {
 
-                        let id = url.replaceAll('.', '-').replaceAll('://', '-').trim()
-                        let td = '<td className="border w-3/12 p-2 text-center" id="' + id + '">\n' +
-                            '       <button className="btn" data-clipboard-target="#' + id + '" data-clipboard-action="copy">\n' +
+                        let uri = url.trim()
+                        let id = uri.replaceAll('.', '-').replaceAll('://', '-').replace(':', '-')
+                        td += '<td class="border p-2 text-center" id="' + id + '">\n' + uri +
+                            '       <button class="btn" data-clipboard-target="#' + id + '" data-clipboard-action="copy">\n' +
                             '           <img src="./dist/clippy.svg" width="16"/>\n' +
                             '       </button>' +
                             '</td>'
 
                         if (i % 5 === 0) {
-                            innerHtml += '<tr>' + td + '</tr>\n'
+                            let tr = document.createElement('tr')
+                            tr.innerHTML = td
+                            tbody.appendChild(tr)
+                            td = ''
                         }
 
                         i++
                     }
-                    tbody.innerHTML = innerHtml;
                 })
                 .catch((error) => {
                     NProgress.done();
                     Notiflix.Notify.failure('请求失败：' + error);
                 });
+
+            initializeClipboard()
         });
     })();
 </script>
