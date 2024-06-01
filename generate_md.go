@@ -4,8 +4,8 @@ import (
     "fmt"
     "github.com/joho/godotenv"
     "github.com/xiaoxuan6/github-mirror/redis"
+    "io/ioutil"
     "os"
-    "path/filepath"
     "strings"
 )
 
@@ -27,12 +27,13 @@ func main() {
     fmt.Println("urls count: ", len(result))
 
     if len(result) > 0 {
-        dir, _ := os.Getwd()
-        filename := filepath.Join(dir, "Links.md")
-        f, _ := os.OpenFile(filename, os.O_APPEND|os.O_CREATE, os.ModePerm)
         for _, val := range result {
             uri := fmt.Sprintf("https://%s", val)
-            _, _ = f.WriteString(fmt.Sprintf("[%s](%s)\n", uri, uri))
+            body := fmt.Sprintf("[%s](%s)\n", uri, uri)
+            err := ioutil.WriteFile("./Links.md", []byte(body), os.ModePerm)
+            if err != nil {
+                fmt.Printf("Error writing to file: %s\n", err.Error())
+            }
         }
     }
 

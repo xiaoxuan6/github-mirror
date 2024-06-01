@@ -21,7 +21,6 @@ jobs:
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
         run: |
           go run generate_md.go
-          cat Links.md
 
       - name: Link Checker
         id: lychee
@@ -32,6 +31,7 @@ jobs:
           args: >-
             --verbose
             --no-progress
+            --user-agent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
             'Links.md'
 
       - name: Create Issue From File
