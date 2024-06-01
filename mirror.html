@@ -77,7 +77,7 @@
                             '       </button>' +
                             '</td>'
 
-                        if (i % 5 === 0) {
+                        if (i % 5 === 0 || items.length === i) {
                             let tr = document.createElement('tr')
                             tr.innerHTML = td
                             tbody.appendChild(tr)
