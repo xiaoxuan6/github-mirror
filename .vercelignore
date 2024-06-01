@@ -1,5 +1,8 @@
-.editorconfig
-README.md
-.gitignore
-LICENSE
 .github
+.editorconfig
+.gitignore
+generate_md.go
+LICENSE
+main.go
+README.md
+
