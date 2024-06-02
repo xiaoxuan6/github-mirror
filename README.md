@@ -1,5 +1,12 @@
 # github-mirror
 
+[![HitCount](https://views.whatilearened.today/views/github/xiaoxuan6/github-mirror.svg)](https://github.com/xiaoxuan6/github-mirror)
+![GitHub forks](https://img.shields.io/github/forks/xiaoxuan6/github-mirror)
+![GitHub Repo stars](https://img.shields.io/github/stars/xiaoxuan6/github-mirror)
+[![Check Links](https://github.com/xiaoxuan6/github-mirror/actions/workflows/links-check.yml/badge.svg)](https://github.com/xiaoxuan6/github-mirror/actions/workflows/links-check.yml)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xiaoxuan6/github-mirror)
+![GitHub License](https://img.shields.io/github/license/xiaoxuan6/github-mirror)
+
 GitHub 文件加速支持release、archive以及文件，右键复制出来的链接都是符合标准的
 
 随机复制一个节点，添加到 `git` 地址前面即可
