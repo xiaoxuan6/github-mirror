@@ -6,3 +6,4 @@ LICENSE
 main.go
 README.md
 resync.go
+sync.go

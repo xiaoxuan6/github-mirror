@@ -2,12 +2,14 @@ name: 🔗 检查链接
 
 on:
   workflow_dispatch:
+  workflow_call:
   schedule:
     - cron: "00 16 * * 1"
 
 jobs:
   linkChecker:
     runs-on: ubuntu-latest
+    if: github.repository == 'xiaoxuan6/github-mirror'
     steps:
       - uses: actions/checkout@v3
 

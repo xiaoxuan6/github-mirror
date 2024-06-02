@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
     "github.com/joho/godotenv"
     "github.com/sirupsen/logrus"
     "github.com/thoas/go-funk"
@@ -13,9 +14,14 @@ func main() {
     _ = godotenv.Load()
 
     failUrls := fetchMdContent()
+    if len(failUrls) < 1 {
+        logrus.Info("not fail urls")
+        return
+    }
+
     urls, err := fetchKvData()
     if err != nil {
-        logrus.Error("获取 kv data 失败：%s", err.Error())
+        logrus.Error(fmt.Sprintf("获取 kv data 失败：%s", err.Error()))
         return
     }
 
@@ -66,9 +72,9 @@ func setKvData(value string) {
 
     res, err := kv.Set(value)
     if err != nil {
-        logrus.Error("kv set fail: %s", err.Error())
+        logrus.Error(fmt.Sprintf("kv set fail: %s", err.Error()))
         return
     }
 
-    logrus.Info("kv set %s", res.Result)
+    logrus.Info(fmt.Sprintf("kv set %s", res.Result))
 }

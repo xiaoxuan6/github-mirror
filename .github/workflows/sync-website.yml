@@ -1,0 +1,47 @@
+name: 'sync website'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "00 16 1 * *"
+
+jobs:
+  sync-website:
+    runs-on: ubuntu-latest
+    if: github.repository == 'xiaoxuan6/github-mirror'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: "Set up Python"
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: "Install dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ./requirements.txt
+          python fofa.py
+        working-directory: .github/src
+
+  sync-kv:
+    needs: [ sycn-website ]
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.20'
+      - name: sync kv
+        env:
+          key: ${{ secrets.key }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+        run: |
+          go mod tidy
+          go run sync.go
+
+  links-check:
+    needs: sync-kv
+    if: ${{ success() }}
+    uses: xiaoxuan6/github-mirror/.github/workflows/links-check.yml@main
+    secrets: inherit
