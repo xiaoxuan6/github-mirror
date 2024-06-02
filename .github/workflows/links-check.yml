@@ -50,6 +50,6 @@ jobs:
           key: ${{ secrets.key }}
           KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
         run: |
-          echo $(cat lychee/out.md | awk '/\*\[/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|https://||g' | tr -d '/')
-          cat lychee/out.md | awk '/\*\[/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|https://||g' | tr -d '/' | xargs echo > out.md
+          echo $(cat lychee/out.md | awk '/\* \[/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|http://||g' | tr -d '/')
+          cat lychee/out.md | awk '/\* \[/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|http://||g' | tr -d '/' | xargs echo > out.md
           go run resync.go
