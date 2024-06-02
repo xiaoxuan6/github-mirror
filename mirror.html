@@ -23,6 +23,7 @@
 </div>
 <div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
     <table class="table-auto w-full">
+        <div class="flex">站点总个数：<p class="text-red-500" id="count"></p></div>
         <tbody id="tbody">
         </tbody>
     </table>
@@ -87,6 +88,8 @@
 
                         i++
                     }
+
+                    document.getElementById('count').innerHTML = items.length
                 })
                 .catch((error) => {
                     NProgress.done();
