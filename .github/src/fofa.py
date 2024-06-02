@@ -1,4 +1,5 @@
 import json
+import re
 import time
 
 from selenium import webdriver
@@ -8,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 class Fofa:
     def __init__(self):
         self.url = 'https://fofa.info/result?qbase64=IumhueebruWfuuS6jkNsb3VkZmxhcmUgV29ya2Vyc%20' \
-                   '%208jOW8gOa6kOS6jkdpdEh1YiIgJiYgY291bnRyeT0iQ04i&page=1&page_size=50 '
+                   '%208jOW8gOa6kOS6jkdpdEh1YiIgJiYgY291bnRyeT0iQ04i&page=1&page_size=50'
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--no-sandbox')
@@ -47,13 +48,9 @@ class Fofa:
         self.driver.refresh()
 
     def download(self):
-        self.driver.find_element_by_xpath(
-            '//*[@id="__layout"]/div/div[2]/div[1]/div[4]/div[2]/div[1]/div/div/div[2]/div[3]/div[2]').click()
-        time.sleep(3)
-
-        contents = self.driver.find_elements_by_class_name('flex-item-content')
+        contents = self.driver.find_elements_by_class_name('hsxa-host')
         for content in contents:
-            text = str(content.text).removeprefix('https://').removeprefix('http://')
+            text = re.sub(r'https?://', '', content.text)
             if len(text) > 0:
                 self.urls.append(f'{text}')
 

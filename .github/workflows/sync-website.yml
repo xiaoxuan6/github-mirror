@@ -22,13 +22,6 @@ jobs:
           pip install -r ./requirements.txt
           python fofa.py
         working-directory: .github/src
-
-  sync-kv:
-    needs: [ sycn-website ]
-    if: ${{ success() }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - uses: actions/setup-go@v2
         with:
           go-version: '1.20'
@@ -41,7 +34,7 @@ jobs:
           go run sync.go
 
   links-check:
-    needs: sync-kv
+    needs: sync-website
     if: ${{ success() }}
     uses: xiaoxuan6/github-mirror/.github/workflows/links-check.yml@main
     secrets: inherit

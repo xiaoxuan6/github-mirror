@@ -33,7 +33,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
 
         var urls []string
         for _, val := range result {
-            urls = append(urls, fmt.Sprintf("https://%s", val))
+            urls = append(urls, fmt.Sprintf("http://%s", val))
         }
 
         response = success(urls)

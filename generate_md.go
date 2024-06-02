@@ -29,7 +29,7 @@ func main() {
     if len(result) > 0 {
         var bodys []string
         for _, val := range result {
-            uri := fmt.Sprintf("https://%s", val)
+            uri := fmt.Sprintf("http://%s", val)
             bodys = append(bodys, fmt.Sprintf("[%s](%s)", uri, uri))
         }
 
