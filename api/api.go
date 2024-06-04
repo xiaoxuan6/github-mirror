@@ -68,7 +68,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
     response, err := http.Get(newUri)
     defer response.Body.Close()
     if err != nil {
-        _, _ = w.Write([]byte("The URL prefix must be https://github.com"))
+        _, _ = w.Write([]byte(err.Error()))
         return
     }
 
