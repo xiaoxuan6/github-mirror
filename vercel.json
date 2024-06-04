@@ -9,7 +9,7 @@
             "dest": "/api/api.go"
         },
         {
-            "src": "/(.*?)",
+            "src": "/(?!((.*?)(.css$|.js$|.svg$)))(.*?)",
             "dest": "/api/api.go"
         }
     ]
