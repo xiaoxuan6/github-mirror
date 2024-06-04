@@ -7,6 +7,10 @@
         {
             "src": "/api/urls",
             "dest": "/api/api.go"
+        },
+        {
+            "src": "/(.*?)",
+            "dest": "/api/api.go"
         }
     ]
 }
