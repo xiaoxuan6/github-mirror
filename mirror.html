@@ -88,7 +88,7 @@
 
                         let uri = url.trim()
                         let id = uri.replaceAll('.', '-').replaceAll('://', '-').replace(':', '-')
-                        td += '<td class="border p-2 text-center" id="' + id + '">\n' +
+                        td += '<td class="border p-2 text-center break-all" id="' + id + '">\n' +
                             '<a href="' + uri + '" target="_blank">' + uri + '</a>' +
                             '       <button class="btn" data-clipboard-target="#' + id + '" data-clipboard-action="copy">\n' +
                             '           <img src="./dist/clippy.svg" width="16"/>\n' +
