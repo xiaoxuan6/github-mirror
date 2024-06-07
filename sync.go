@@ -4,8 +4,10 @@ import (
     "fmt"
     "github.com/joho/godotenv"
     "github.com/sirupsen/logrus"
+    "github.com/thoas/go-funk"
     "github.com/xiaoxuan6/github-mirror/redis"
     "os"
+    "strings"
 )
 
 func main() {
@@ -23,6 +25,19 @@ func main() {
         return
     }
 
+    s, _ := fetchKvItem()
+    if len(s) > 0 {
+        urls := strings.Split(string(b), ",")
+
+        funk.ForEach(urls, func(url string) {
+            s = append(s, url)
+        })
+
+        newUrls := funk.UniqString(s)
+        urlStr := strings.Join(newUrls, ",")
+        b = []byte(urlStr)
+    }
+
     kv := redis.NewKvClient(&redis.Option{
         Token:  os.Getenv("KV_REST_API_TOKEN"),
         Key:    os.Getenv("key"),
@@ -36,4 +51,20 @@ func main() {
     }
 
     logrus.Info(fmt.Sprintf("kv set %s", res.Result))
+}
+
+func fetchKvItem() ([]string, error) {
+    kv := redis.NewKvClient(&redis.Option{
+        Token:  os.Getenv("KV_REST_API_TOKEN"),
+        Key:    os.Getenv("key"),
+        Action: "get",
+    })
+
+    res, err := kv.Get()
+    if err != nil {
+        return nil, err
+    }
+
+    result := strings.Split(res.Result, ",")
+    return result, nil
 }
