@@ -2,8 +2,8 @@ name: 'sync website'
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "00 16 1 * *"
+  #schedule:
+   # - cron: "00 16 1 * *"
 
 jobs:
   sync-website:
