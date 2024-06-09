@@ -3,6 +3,7 @@ package api
 import (
     "encoding/json"
     "fmt"
+    "github.com/sirupsen/logrus"
     "github.com/thoas/go-funk"
     "github.com/xiaoxuan6/github-mirror/redis"
     "io/ioutil"
@@ -47,8 +48,24 @@ func Api(w http.ResponseWriter, r *http.Request) {
 
     if ok := strings.Compare(uri, "api/url/save"); ok == 0 {
         w.Header().Set("Content-Type", "application/json;charset=utf-8")
-        _ = r.ParseForm()
+        err := r.ParseForm()
+        if err != nil {
+            logrus.Info("解析post参数错误", err.Error())
+        }
+
         url := r.PostForm.Get("url")
+        logrus.Info("请求参数 url：", url)
+
+        url1 := r.FormValue("url")
+        logrus.Info("请求参数 url1：", url1)
+
+        type RequestBody struct {
+            Url string `json:"url"`
+        }
+        var requestBody RequestBody
+        _ = json.NewDecoder(r.Body).Decode(&requestBody)
+        logrus.Info("请求参数 requestBody.url：", requestBody.Url)
+
         url = strings.TrimLeft(strings.TrimLeft(url, "http://"), "https://")
         url = strings.Trim(url, "/")
 
