@@ -58,6 +58,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
         logrus.Info("请求参数 requestBody.url：", requestBody.Url)
 
         res, err := http.Get(requestBody.Url)
+        defer res.Body.Close()
         if err != nil {
             response := errors(errors2.New(fmt.Sprintf("url fail: %s", err.Error())))
             b, _ := json.Marshal(response)
@@ -67,6 +68,14 @@ func Api(w http.ResponseWriter, r *http.Request) {
 
         if res.StatusCode != 200 {
             response := errors(errors2.New(fmt.Sprintf("url fail status code: %s", res.Status)))
+            b, _ := json.Marshal(response)
+            _, _ = w.Write(b)
+            return
+        }
+
+        body, _ := ioutil.ReadAll(res.Body)
+        if stat := strings.Contains(string(body), "gh-proxy"); !stat {
+            response := errors(errors2.New(fmt.Sprintf("url [%s] not support github proxy", requestBody.Url)))
             b, _ := json.Marshal(response)
             _, _ = w.Write(b)
             return
