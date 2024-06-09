@@ -25,6 +25,12 @@
             /https://github.com/xiaoxuan6/github-mirror/blob/main/README.md</p>
         </div>
     </div>
+
+    <div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
+        <input type="text" class="mb-4 p-2 border w-full" id="input" placeholder="请输入有效的 url/ip">
+        <a id="submit" href="javascript:void(0);"
+           class="bg-blue-500 hover:bg-blue-700 text-white py-3 px-5 w-full block text-center rounded">提交</a>
+    </div>
 </div>
 <div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
     <table class="table-auto w-full">
@@ -114,6 +120,30 @@
 
             initializeClipboard()
             initServe()
+
+            document.getElementById("submit").addEventListener("click", function () {
+                let val = document.getElementById('input').value
+
+                NProgress.start();
+                fetch("/api/url/save", {
+                    method: "post",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({url: val})
+                })
+                    .then((re) => re.json())
+                    .then((data) => {
+                        NProgress.done();
+                        if (data.code !== 200) {
+                            Notiflix.Notify.failure('提交失败！' + data.msg);
+                            return
+                        }
+
+                        Notiflix.Notify.success('提交成功！')
+                        window.location.reload()
+                    })
+            })
         });
     })();
 </script>

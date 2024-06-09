@@ -9,6 +9,10 @@
             "dest": "/api/api.go"
         },
         {
+            "src": "/api/url/save",
+            "dest": "/api/api.go"
+        },
+        {
             "src": "/(?!((.*?)(.css$|.js$|.svg$)))(.*?)",
             "dest": "/api/api.go"
         }

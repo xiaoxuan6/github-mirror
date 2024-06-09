@@ -45,6 +45,19 @@ func Api(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    if ok := strings.Compare(uri, "api/url/save"); ok == 0 {
+        w.Header().Set("Content-Type", "application/json;charset=utf-8")
+        _ = r.ParseForm()
+        url := r.PostForm.Get("url")
+        url = strings.TrimLeft(strings.TrimLeft(url, "http://"), "https://")
+        url = strings.Trim(url, "/")
+
+        response := save(url)
+        b, _ := json.Marshal(response)
+        _, _ = w.Write(b)
+        return
+    }
+
     fmt.Println(uri)
     if ok := strings.HasPrefix(uri, "https:/github.com"); ok == false {
         _, _ = w.Write([]byte("The URL prefix must be https://github.com"))
@@ -74,6 +87,42 @@ func Api(w http.ResponseWriter, r *http.Request) {
 
     b, _ := ioutil.ReadAll(response.Body)
     _, _ = w.Write(b)
+}
+
+func save(uri string) *Response {
+    res, err := fetchData()
+    if err != nil {
+        return errors(err)
+    }
+
+    l := strings.Split(res.Result, ",")
+    urls := funk.UniqString(l)
+
+    stat := true
+    funk.ForEach(urls, func(url string) {
+        if ok := strings.Compare(url, uri); ok == 0 {
+            stat = false
+            return
+        }
+    })
+
+    if stat == true {
+        urls = append(urls, uri)
+    }
+
+    kv := redis.NewKvClient(&redis.Option{
+        Token:  os.Getenv("KV_REST_API_TOKEN"),
+        Key:    os.Getenv("key"),
+        Action: "set",
+    })
+
+    _, err = kv.Set(strings.Join(urls, ","))
+    if err != nil {
+        return errors(err)
+    }
+
+    data := make([]string, 0)
+    return success(data)
 }
 
 func fetchData() (redis.Response, error) {
