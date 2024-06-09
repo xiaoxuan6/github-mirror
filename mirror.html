@@ -126,6 +126,11 @@
             document.getElementById("submit").addEventListener("click", function () {
                 let val = document.getElementById('input').value
 
+                if (val.length < 1) {
+                    Notiflix.Notify.failure('请输入有效的 url/ip');
+                    return
+                }
+
                 NProgress.start();
                 fetch("/api/url/save", {
                     method: "post",
