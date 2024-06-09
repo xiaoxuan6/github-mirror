@@ -7,6 +7,7 @@
     <meta name="description" content='github 文件加速'>
     <meta name="anthor" content="xiaoxuan6">
     <link rel="stylesheet" href="dist/css/tailwind.min.css"/>
+    <link rel="stylesheet" href="dist/css/notiflix-3.2.6.min.css">
     <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
 </head>
 <body class="bg-gray-200 h-screen">
@@ -52,6 +53,7 @@
             let clipboard = new ClipboardJS('.btn');
 
             clipboard.on('success', function (e) {
+                Notiflix.Notify.success('复制成功！')
                 console.info('Text:', e.text);
             });
 
@@ -141,7 +143,9 @@
                         }
 
                         Notiflix.Notify.success('提交成功！')
-                        window.location.reload()
+                        setTimeout(function () {
+                            window.location.reload()
+                        }, 3000)
                     })
             })
         });

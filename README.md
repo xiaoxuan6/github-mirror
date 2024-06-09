@@ -13,14 +13,19 @@ GitHub 文件加速支持release、archive以及文件，右键复制出来的�
 
 ## 公益站
 
-[https://github-mirror-alpha.vercel.app](https://github-mirror-alpha.vercel.app)
+[https://github-mirror-alpha.vercel.app](https://github-mirror-alpha.vercel.app) (墙)
+
+[https://github-mirror.us.kg](https://github-mirror.us.kg)
 
 ## Example
+
+> [!NOTE]  
+> 网站部署在 `vercel` 中，大流量请绕行！！！
 
 例如：
 
 ```shell
-https://github-mirror-alpha.vercel.app/https://github.com/xiaoxuan6/github-mirror/blob/main/README.md
+https://github-mirror.us.kg/https://github.com/xiaoxuan6/github-mirror/blob/main/README.md
 ```
 
 以下都是合法输入：
