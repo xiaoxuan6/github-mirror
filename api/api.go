@@ -51,11 +51,26 @@ func Api(w http.ResponseWriter, r *http.Request) {
         w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
         type RequestBody struct {
-            Url string `json:"url"`
+            Url      string `json:"url"`
+            Response string `json:"response"`
         }
         var requestBody RequestBody
         _ = json.NewDecoder(r.Body).Decode(&requestBody)
-        logrus.Info("请求参数 requestBody.url：", requestBody.Url)
+        logrus.Info("请求参数 requestBody.url：", requestBody)
+
+        if len(requestBody.Response) < 1 {
+            response := errors(errors2.New("验证失败"))
+            b, _ := json.Marshal(response)
+            _, _ = w.Write(b)
+            return
+        }
+
+        if ok := turnstileVerify(requestBody.Response); !ok {
+            response := errors(errors2.New("验证失败"))
+            b, _ := json.Marshal(response)
+            _, _ = w.Write(b)
+            return
+        }
 
         res, err := http.Get(requestBody.Url)
         defer res.Body.Close()
@@ -119,6 +134,33 @@ func Api(w http.ResponseWriter, r *http.Request) {
 
     b, _ := ioutil.ReadAll(response.Body)
     _, _ = w.Write(b)
+}
+
+func turnstileVerify(response string) bool {
+    body := `{"secret":"` + os.Getenv("secret") + `", "response":"` + response + `"}`
+    re, _ := http.NewRequest(http.MethodPost, "https://challenges.cloudflare.com/turnstile/v0/siteverify", strings.NewReader(body))
+    re.Header.Set("Content-Type", "application/json")
+    res, err := http.DefaultClient.Do(re)
+    defer res.Body.Close()
+    if err != nil {
+        logrus.Error("http client fail: " + err.Error())
+        return false
+    }
+
+    result := struct {
+        Success     bool     `json:"success"`
+        ErrorCodes  []string `json:"error-codes"`
+        ChallengeTs string   `json:"challenge_ts"`
+        Hostname    string   `json:"hostname"`
+    }{}
+
+    b, _ := ioutil.ReadAll(res.Body)
+    _ = json.Unmarshal(b, &result)
+    if result.Success != true {
+        return false
+    }
+
+    return true
 }
 
 func save(uri string) *Response {
