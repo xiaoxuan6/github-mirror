@@ -29,9 +29,9 @@
     </div>
 
     <div class="bg-white mx-4 mb-4 p-4 rounded-lg shadow">
-        <div class="w-full">
+        <div class="w-full flex">
             <input type="text" class="mb-4 p-2 border w-9/12" id="input" placeholder="请输入有效的 url/ip">
-            <div class="cf-turnstile" data-sitekey="0x4AAAAAAAcUAv_3p8uWE8ET" data-callback="javascriptCallback"></div>
+            <div class="cf-turnstile ml-3" data-sitekey="0x4AAAAAAAcUAv_3p8uWE8ET" data-callback="javascriptCallback"></div>
         </div>
         <a id="submit" href="javascript:void(0);"
            class="bg-blue-500 hover:bg-blue-700 text-white py-3 px-5 w-full block text-center rounded">提交</a>
@@ -129,7 +129,7 @@
 
             document.getElementById("submit").addEventListener("click", function () {
                 let val = document.getElementById('input').value
-                let response = document.getElementById('cf-chl-widget-5lysj_response').value
+                let response = document.querySelector("input[name='cf-turnstile-response']").value
 
                 if (val.length < 1) {
                     Notiflix.Notify.failure('请输入有效的 url/ip');
