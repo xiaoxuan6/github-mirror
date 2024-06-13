@@ -11,6 +11,10 @@ GitHub 文件加速支持release、archive以及文件，右键复制出来的�
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xiaoxuan6/github-mirror)
 ![GitHub License](https://img.shields.io/github/license/xiaoxuan6/github-mirror)
 
+# 免责声明
+
+本项目仅做学习使用，如果使用到您的网站，您不满意，请联系我删除。
+
 ## 公益站
 
 [https://github-mirror-alpha.vercel.app](https://github-mirror-alpha.vercel.app) (墙)
@@ -19,7 +23,7 @@ GitHub 文件加速支持release、archive以及文件，右键复制出来的�
 
 ## Example
 
-> [!NOTE]  
+> [!NOTE]
 > 网站部署在 `vercel` 中，大流量请绕行！！！
 
 例如：
