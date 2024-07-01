@@ -103,16 +103,8 @@ func Api(w http.ResponseWriter, r *http.Request) {
         l := strings.Split(result, ",")
         urls := funk.UniqString(l)
 
-        stat := true
-        funk.ForEach(urls, func(url string) {
-            if ok := strings.Compare(url, uri); ok == 0 {
-                stat = false
-                return
-            }
-        })
-
-        if stat == true {
-            urls = append(urls, uri)
+        if !funk.ContainsString(urls, url) {
+            urls = append(urls, url)
         }
 
         _ = client.Set(os.Getenv("key"), strings.Join(urls, ","))
