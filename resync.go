@@ -1,7 +1,6 @@
 package main
 
 import (
-    "fmt"
     "github.com/joho/godotenv"
     "github.com/sirupsen/logrus"
     "github.com/thoas/go-funk"
@@ -15,21 +14,23 @@ func main() {
 
     failUrls := fetchMdContent()
     if len(failUrls) < 1 {
-        logrus.Info("not fail urls")
+        logrus.Error("not fail urls")
         return
     }
 
-    urls, err := fetchKvData()
+    client := redis.NewClient()
+    result, err := client.Get(os.Getenv("key"))
     if err != nil {
-        logrus.Error(fmt.Sprintf("获取 kv data 失败：%s", err.Error()))
+        logrus.Error("kv get value fail: ", err.Error())
         return
     }
 
+    urls := strings.Split(result, ",")
     diffUrls, _ := funk.Difference(urls, failUrls)
     diffs := diffUrls.([]string)
     if len(diffs) > 0 {
         body := strings.Join(diffs, ",")
-        setKvData(body)
+        _ = client.Set(os.Getenv("key"), body)
     }
 
     logrus.Info("resync done.")
@@ -45,36 +46,4 @@ func fetchMdContent() []string {
     }
 
     return urls
-}
-
-func fetchKvData() ([]string, error) {
-    kv := redis.NewKvClient(&redis.Option{
-        Token:  os.Getenv("KV_REST_API_TOKEN"),
-        Key:    os.Getenv("key"),
-        Action: "get",
-    })
-
-    res, err := kv.Get()
-    if err != nil {
-        return nil, err
-    }
-
-    result := strings.Split(res.Result, ",")
-    return result, nil
-}
-
-func setKvData(value string) {
-    kv := redis.NewKvClient(&redis.Option{
-        Token:  os.Getenv("KV_REST_API_TOKEN"),
-        Key:    os.Getenv("key"),
-        Action: "set",
-    })
-
-    res, err := kv.Set(value)
-    if err != nil {
-        logrus.Error(fmt.Sprintf("kv set fail: %s", err.Error()))
-        return
-    }
-
-    logrus.Info(fmt.Sprintf("kv set %s", res.Result))
 }

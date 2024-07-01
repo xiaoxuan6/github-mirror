@@ -11,19 +11,15 @@ import (
 
 func main() {
     _ = godotenv.Load()
-    kv := redis.NewKvClient(&redis.Option{
-        Key:    os.Getenv("key"),
-        Token:  os.Getenv("KV_REST_API_TOKEN"),
-        Action: "get",
-    })
 
-    res, err := kv.Get()
+    client := redis.NewClient()
+    res, err := client.Get(os.Getenv("key"))
     if err != nil {
         fmt.Printf("kv 获取失败：%s", err.Error())
         return
     }
 
-    result := strings.Split(res.Result, ",")
+    result := strings.Split(res, ",")
     fmt.Println("urls count: ", len(result))
 
     if len(result) > 0 {

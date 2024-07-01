@@ -20,7 +20,8 @@ type Response struct {
 }
 
 func Api(w http.ResponseWriter, r *http.Request) {
-    //_ = godotenv.Load()
+
+    client := redis.NewClient()
 
     uri := r.RequestURI
     uri = strings.Trim(uri, "/")
@@ -28,11 +29,11 @@ func Api(w http.ResponseWriter, r *http.Request) {
         w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
         var response *Response
-        res, err := fetchData()
+        res, err := client.Get(os.Getenv("key"))
         if err != nil {
             response = errors(err)
         } else {
-            result := strings.Split(res.Result, ",")
+            result := strings.Split(res, ",")
 
             var urls []string
             for _, val := range result {
@@ -42,8 +43,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
             response = success(urls)
         }
 
-        b, _ := json.Marshal(response)
-        _, _ = w.Write(b)
+        output(response, w)
         return
     }
 
@@ -60,15 +60,13 @@ func Api(w http.ResponseWriter, r *http.Request) {
 
         if len(requestBody.Response) < 1 {
             response := errors(errors2.New("验证失败"))
-            b, _ := json.Marshal(response)
-            _, _ = w.Write(b)
+            output(response, w)
             return
         }
 
         if ok := turnstileVerify(requestBody.Response); !ok {
             response := errors(errors2.New("验证失败"))
-            b, _ := json.Marshal(response)
-            _, _ = w.Write(b)
+            output(response, w)
             return
         }
 
@@ -76,48 +74,64 @@ func Api(w http.ResponseWriter, r *http.Request) {
         defer res.Body.Close()
         if err != nil {
             response := errors(errors2.New(fmt.Sprintf("url fail: %s", err.Error())))
-            b, _ := json.Marshal(response)
-            _, _ = w.Write(b)
+            output(response, w)
             return
         }
 
         if res.StatusCode != 200 {
             response := errors(errors2.New(fmt.Sprintf("url fail status code: %s", res.Status)))
-            b, _ := json.Marshal(response)
-            _, _ = w.Write(b)
+            output(response, w)
             return
         }
 
         body, _ := ioutil.ReadAll(res.Body)
         if stat := strings.Contains(string(body), "gh-proxy"); !stat {
             response := errors(errors2.New(fmt.Sprintf("url [%s] not support github proxy", requestBody.Url)))
-            b, _ := json.Marshal(response)
-            _, _ = w.Write(b)
+            output(response, w)
             return
         }
 
         url := strings.TrimLeft(strings.TrimLeft(requestBody.Url, "http://"), "https://")
         url = strings.Trim(url, "/")
 
-        response := save(url)
-        b, _ := json.Marshal(response)
-        _, _ = w.Write(b)
+        result, err := client.Get(os.Getenv("key"))
+        if err != nil {
+            output(errors(errors2.New("kv get value fail")), w)
+            return
+        }
+
+        l := strings.Split(result, ",")
+        urls := funk.UniqString(l)
+
+        stat := true
+        funk.ForEach(urls, func(url string) {
+            if ok := strings.Compare(url, uri); ok == 0 {
+                stat = false
+                return
+            }
+        })
+
+        if stat == true {
+            urls = append(urls, uri)
+        }
+
+        _ = client.Set(os.Getenv("key"), strings.Join(urls, ","))
+        output(success(nil), w)
         return
     }
 
-    fmt.Println(uri)
     if ok := strings.HasPrefix(uri, "https:/github.com"); ok == false {
         _, _ = w.Write([]byte("The URL prefix must be https://github.com"))
         return
     }
 
-    res, err := fetchData()
+    res, err := client.Get(os.Getenv("key"))
     if err != nil {
         _, _ = w.Write([]byte(err.Error()))
         return
     }
 
-    result := strings.Split(res.Result, ",")
+    result := strings.Split(res, ",")
     i := funk.RandomInt(0, len(result)-1)
     proxy := result[i]
     if len(proxy) == 0 {
@@ -163,52 +177,6 @@ func turnstileVerify(response string) bool {
     return true
 }
 
-func save(uri string) *Response {
-    res, err := fetchData()
-    if err != nil {
-        return errors(err)
-    }
-
-    l := strings.Split(res.Result, ",")
-    urls := funk.UniqString(l)
-
-    stat := true
-    funk.ForEach(urls, func(url string) {
-        if ok := strings.Compare(url, uri); ok == 0 {
-            stat = false
-            return
-        }
-    })
-
-    if stat == true {
-        urls = append(urls, uri)
-    }
-
-    kv := redis.NewKvClient(&redis.Option{
-        Token:  os.Getenv("KV_REST_API_TOKEN"),
-        Key:    os.Getenv("key"),
-        Action: "set",
-    })
-
-    _, err = kv.Set(strings.Join(urls, ","))
-    if err != nil {
-        return errors(err)
-    }
-
-    data := make([]string, 0)
-    return success(data)
-}
-
-func fetchData() (redis.Response, error) {
-    kv := redis.NewKvClient(&redis.Option{
-        Token:  os.Getenv("KV_REST_API_TOKEN"),
-        Key:    os.Getenv("key"),
-        Action: "get",
-    })
-
-    return kv.Get()
-}
-
 func success(data []string) *Response {
     return &Response{
         Code: 200,
@@ -223,4 +191,9 @@ func errors(err error) *Response {
         Msg:  err.Error(),
         Data: nil,
     }
+}
+
+func output(response *Response, w http.ResponseWriter) {
+    b, _ := json.Marshal(response)
+    _, _ = w.Write(b)
 }
