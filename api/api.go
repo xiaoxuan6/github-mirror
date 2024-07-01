@@ -100,11 +100,12 @@ func Api(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        l := strings.Split(result, ",")
-        urls := funk.UniqString(l)
-
+        urls := funk.UniqString(strings.Split(result, ","))
         if !funk.ContainsString(urls, url) {
             urls = append(urls, url)
+        } else {
+            output(errors(errors2.New(fmt.Sprintf("url [%s] is exists", url))), w)
+            return
         }
 
         _ = client.Set(os.Getenv("key"), strings.Join(urls, ","))
