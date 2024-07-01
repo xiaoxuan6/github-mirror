@@ -2,22 +2,16 @@ package api
 
 import (
     "encoding/json"
-    errors2 "errors"
     "fmt"
     "github.com/sirupsen/logrus"
     "github.com/thoas/go-funk"
+    "github.com/xiaoxuan6/github-mirror/handlers"
     "github.com/xiaoxuan6/github-mirror/redis"
     "io/ioutil"
     "net/http"
     "os"
     "strings"
 )
-
-type Response struct {
-    Code int      `json:"code"`
-    Msg  string   `json:"msg"`
-    Data []string `json:"data"`
-}
 
 func Api(w http.ResponseWriter, r *http.Request) {
 
@@ -28,19 +22,16 @@ func Api(w http.ResponseWriter, r *http.Request) {
     if ok := strings.Compare(uri, "api/urls"); ok == 0 {
         w.Header().Set("Content-Type", "application/json;charset=utf-8")
 
-        var response *Response
-        res, err := client.Get(os.Getenv("key"))
+        response, err := handlers.RedisHandler.Get()
         if err != nil {
-            response = errors(err)
+            response = handlers.Error(err)
         } else {
-            result := strings.Split(res, ",")
-
             var urls []string
-            for _, val := range result {
+            for _, val := range response.Data {
                 urls = append(urls, fmt.Sprintf("http://%s", val))
             }
 
-            response = success(urls)
+            response = handlers.Success(urls)
         }
 
         output(response, w)
@@ -59,57 +50,42 @@ func Api(w http.ResponseWriter, r *http.Request) {
         logrus.Info("请求参数 requestBody.url：", requestBody)
 
         if len(requestBody.Response) < 1 {
-            response := errors(errors2.New("验证失败"))
-            output(response, w)
+            output(handlers.ErrorM("验证失败"), w)
             return
         }
 
         if ok := turnstileVerify(requestBody.Response); !ok {
-            response := errors(errors2.New("验证失败"))
-            output(response, w)
+            output(handlers.ErrorM("验证失败"), w)
             return
         }
 
         res, err := http.Get(requestBody.Url)
         defer res.Body.Close()
         if err != nil {
-            response := errors(errors2.New(fmt.Sprintf("url fail: %s", err.Error())))
-            output(response, w)
+            output(handlers.ErrorM(fmt.Sprintf("get url body fail: %s", err.Error())), w)
             return
         }
 
         if res.StatusCode != 200 {
-            response := errors(errors2.New(fmt.Sprintf("url fail status code: %s", res.Status)))
-            output(response, w)
+            output(handlers.ErrorM(fmt.Sprintf("url fail status code: %s", res.Status)), w)
             return
         }
 
         body, _ := ioutil.ReadAll(res.Body)
         if stat := strings.Contains(string(body), "gh-proxy"); !stat {
-            response := errors(errors2.New(fmt.Sprintf("url [%s] not support github proxy", requestBody.Url)))
-            output(response, w)
+            output(handlers.ErrorM(fmt.Sprintf("url [%s] not support github proxy", requestBody.Url)), w)
             return
         }
 
         url := strings.TrimLeft(strings.TrimLeft(requestBody.Url, "http://"), "https://")
         url = strings.Trim(url, "/")
 
-        result, err := client.Get(os.Getenv("key"))
-        if err != nil {
-            output(errors(errors2.New("kv get value fail")), w)
-            return
-        }
-
-        urls := funk.UniqString(strings.Split(result, ","))
-        if !funk.ContainsString(urls, url) {
-            urls = append(urls, url)
+        if err = handlers.RedisHandler.SetWithUrl(url); err != nil {
+            output(handlers.Error(err), w)
         } else {
-            output(errors(errors2.New(fmt.Sprintf("url [%s] is exists", url))), w)
-            return
+            output(handlers.Success(nil), w)
         }
 
-        _ = client.Set(os.Getenv("key"), strings.Join(urls, ","))
-        output(success(nil), w)
         return
     }
 
@@ -170,23 +146,7 @@ func turnstileVerify(response string) bool {
     return true
 }
 
-func success(data []string) *Response {
-    return &Response{
-        Code: 200,
-        Msg:  "ok",
-        Data: data,
-    }
-}
-
-func errors(err error) *Response {
-    return &Response{
-        Code: 500,
-        Msg:  err.Error(),
-        Data: nil,
-    }
-}
-
-func output(response *Response, w http.ResponseWriter) {
+func output(response *handlers.Response, w http.ResponseWriter) {
     b, _ := json.Marshal(response)
     _, _ = w.Write(b)
 }

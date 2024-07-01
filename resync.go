@@ -4,7 +4,7 @@ import (
     "github.com/joho/godotenv"
     "github.com/sirupsen/logrus"
     "github.com/thoas/go-funk"
-    "github.com/xiaoxuan6/github-mirror/redis"
+    "github.com/xiaoxuan6/github-mirror/handlers"
     "os"
     "strings"
 )
@@ -12,38 +12,25 @@ import (
 func main() {
     _ = godotenv.Load()
 
-    failUrls := fetchMdContent()
+    b, _ := os.ReadFile("out.md")
+    failUrls := strings.Split(string(b), " ")
     if len(failUrls) < 1 {
         logrus.Error("not fail urls")
         return
     }
 
-    client := redis.NewClient()
-    result, err := client.Get(os.Getenv("key"))
+    response, err := handlers.RedisHandler.Get()
     if err != nil {
         logrus.Error("kv get value fail: ", err.Error())
         return
     }
 
-    urls := strings.Split(result, ",")
-    diffUrls, _ := funk.Difference(urls, failUrls)
+    diffUrls, _ := funk.Difference(response.Data, failUrls)
     diffs := diffUrls.([]string)
     if len(diffs) > 0 {
         body := strings.Join(diffs, ",")
-        _ = client.Set(os.Getenv("key"), body)
+        handlers.RedisHandler.Set(body)
     }
 
     logrus.Info("resync done.")
-}
-
-func fetchMdContent() []string {
-    b, _ := os.ReadFile("out.md")
-    split := strings.Split(string(b), " ")
-
-    var urls []string
-    for _, val := range split {
-        urls = append(urls, strings.TrimSpace(val))
-    }
-
-    return urls
 }
