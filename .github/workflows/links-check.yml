@@ -19,6 +19,7 @@ jobs:
 
       - name: generate links.md
         env:
+          key: ${{ secrets.key }}
           KV_URL: ${{ secrets.KV_URL }}
         run: |
           go run generate_md.go
@@ -46,6 +47,7 @@ jobs:
       - name: check fail url and resync kv
         if: success()
         env:
+          key: ${{ secrets.key }}
           KV_URL: ${{ secrets.KV_URL }}
         run: |
           echo $(cat lychee/out.md | awk '/\* \[/ {print $3}' | sort -u | sed -e 's|\[||g' -e 's|\].*||g' -e 's|http://||g' | tr -d '/')
