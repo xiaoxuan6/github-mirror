@@ -104,7 +104,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
     i := funk.RandomInt(0, len(result)-1)
     proxy := result[i]
     if len(proxy) == 0 {
-        proxy = "https://mirror.ghproxy.com"
+        proxy = "ghp.ci"
     }
 
     newUri := fmt.Sprintf("http://%s/%s", proxy, strings.ReplaceAll(uri, "https:/", "https://"))
