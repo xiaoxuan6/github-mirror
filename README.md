@@ -19,7 +19,13 @@ GitHub 文件加速支持release、archive以及文件，右键复制出来的�
 
 [https://github-mirror-alpha.vercel.app](https://github-mirror-alpha.vercel.app) (墙)
 
-[https://github-mirror.us.kg](https://github-mirror.us.kg)
+~[https://github-mirror.us.kg](https://github-mirror.us.kg)~
+
+[https://github-mirror.xiaoxuan6.me](https://github-mirror.xiaoxuan6.me)
+
+[https://www.github-mirrors.zone.id](https://www.github-mirrors.zone.id)
+
+[https://github-mirrors.zone.id](https://github-mirrors.zone.id)
 
 ## Example
 
@@ -29,7 +35,7 @@ GitHub 文件加速支持release、archive以及文件，右键复制出来的�
 例如：
 
 ```shell
-https://github-mirror.us.kg/https://github.com/xiaoxuan6/github-mirror/blob/main/README.md
+https://github-mirror.xiaoxuan6.me/https://github.com/xiaoxuan6/github-mirror/blob/main/README.md
 ```
 
 以下都是合法输入：
