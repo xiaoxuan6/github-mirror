@@ -72,7 +72,7 @@ func Api(w http.ResponseWriter, r *http.Request) {
         }
 
         body, _ := ioutil.ReadAll(res.Body)
-        if stat := strings.Contains(string(body), "gh-proxy"); !stat {
+        if ok := strings.Contains(string(body), "href=\"https://github.com/hunshcn/gh-proxy\">hunshcn/gh-proxy</a>"); !ok {
             output(handlers.ErrorM(fmt.Sprintf("url [%s] not support github proxy", requestBody.Url)), w)
             return
         }

@@ -11,7 +11,7 @@ import (
 )
 
 var (
-    client    *redis.Redis
+    client       *redis.Redis
     RedisHandler = new(redisHandler)
 )
 
@@ -30,6 +30,15 @@ func (kh redisHandler) Get() (*Response, error) {
     }
 
     return Success(strings.Split(result, ",")), nil
+}
+
+func (kh redisHandler) GetWithBody() string {
+    result, err := client.Get(os.Getenv("key"))
+    if err != nil {
+        return ""
+    }
+
+    return result
 }
 
 func (kh redisHandler) Set(value string) string {
