@@ -38,7 +38,7 @@ jobs:
 
       - name: Create Issue From File
         if: env.lychee_exit_code != 0
-        uses: peter-evans/create-issue-from-file@v5
+        uses: peter-evans/create-issue-from-file@v6
         with:
           title: 🔗 链接检查报告
           content-filepath: ./lychee/out.md
